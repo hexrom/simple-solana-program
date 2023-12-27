@@ -12,7 +12,22 @@ jobs:
     - name: Checkout code
       uses: actions/checkout@v2
 
-    - name: Run cargo audit check
-      uses: actions-rs/audit-check@v1
+    - name: Install Rust toolchain
+      uses: actions-rs/toolchain@v1
       with:
-        token: ${{ secrets.GITHUB_TOKEN }}
+        toolchain: stable
+        profile: minimal
+        override: true
+
+    - name: Install cargo-audit
+      run: cargo install cargo-audit
+
+    - name: Search and Audit Cargo Projects
+      run: |
+        for cargo_toml in $(find . -name 'Cargo.toml'); do
+          dir=$(dirname $cargo_toml)
+          echo "Running cargo audit in $dir"
+          (cd $dir && cargo generate-lockfile && cargo audit)
+        done
+
+
