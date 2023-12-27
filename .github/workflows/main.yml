@@ -27,6 +27,11 @@ jobs:
     - name: Create audit-results directory
       run: mkdir -p audit-results
 
+    - name: Run Clippy Linter
+      run: |
+        rustup component add clippy
+        cargo clippy
+
     - name: Search and Audit Cargo Projects
       run: |
         audit_failures=0
