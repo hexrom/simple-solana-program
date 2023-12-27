@@ -30,21 +30,28 @@ jobs:
     - name: Search and Audit Cargo Projects
       run: |
         audit_failures=0
+        echo "Starting audit..."
         for cargo_toml in $(find . -name 'Cargo.toml'); do
           dir=$(dirname $cargo_toml)
           project_name=$(basename "$dir")
           audit_file="audit-results/${project_name}_audit.json"
           echo "Running cargo audit in $dir, output to $audit_file"
-          (cd "$dir" && cargo generate-lockfile && cargo audit --json > "$audit_file") || {
-            echo "Vulnerabilities found in $dir"
+          (cd "$dir" && cargo generate-lockfile && cargo audit --json && echo "Audit successful" || echo "Audit failed") > "$audit_file"
+          if [ ! -s "$audit_file" ]; then
+            echo "No output generated for $audit_file"
+            rm "$audit_file"
+          else
             audit_failures=$((audit_failures+1))
-          }
+            echo "Vulnerabilities found in $dir"
+          fi
         done
         echo "Cargo audit completed with $audit_failures project(s) having vulnerabilities."
         if [ $audit_failures -ne 0 ]; then
           echo "Please review the vulnerabilities reported above."
           exit 0
         fi
+        echo "Audit process complete. Listing audit-results directory:"
+        ls -la audit-results/
 
     - name: Upload audit results
       uses: actions/upload-artifact@v2
