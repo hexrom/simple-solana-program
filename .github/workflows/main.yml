@@ -27,10 +27,13 @@ jobs:
     - name: Search and Audit Cargo Projects
       run: |
         audit_failures=0
+        mkdir -p audit-results
         for cargo_toml in $(find . -name 'Cargo.toml'); do
           dir=$(dirname $cargo_toml)
-          echo "Running cargo audit in $dir"
-          (cd $dir && cargo generate-lockfile && cargo audit) || {
+          project_name=$(basename "$dir")
+          audit_file="audit-results/${project_name}_audit.json"
+          echo "Running cargo audit in $dir, output to $audit_file"
+          (cd "$dir" && cargo generate-lockfile && cargo audit --json > "$audit_file") || {
             echo "Vulnerabilities found in $dir"
             audit_failures=$((audit_failures+1))
           }
@@ -39,5 +42,11 @@ jobs:
         if [ $audit_failures -ne 0 ]; then
           echo "Please review the vulnerabilities reported above."
           # Optional: exit with success to not fail the pipeline
-           exit 0
+          exit 0
         fi
+
+    - name: Upload audit results
+      uses: actions/upload-artifact@v2
+      with:
+        name: cargo-audit-results
+        path: audit-results/
