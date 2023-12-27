@@ -20,17 +20,21 @@ jobs:
         toolchain: stable
         profile: minimal
         override: true
-
+        
     - name: Install cargo-audit
       run: cargo install cargo-audit
 
     - name: Create audit-results directory
       run: mkdir -p audit-results
 
-    - name: Run Clippy Linter
+    - name: Run Clippy on all Rust projects
       run: |
         rustup component add clippy
-        cargo clippy
+        find . -name 'Cargo.toml' | while read cargo_toml; do
+          dir=$(dirname "$cargo_toml")
+          echo "Running Clippy in $dir"
+          (cd "$dir" && cargo clippy)
+        done
 
     - name: Search and Audit Cargo Projects
       run: |
