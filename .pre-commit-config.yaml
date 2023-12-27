@@ -3,4 +3,4 @@ repos:
     rev: 'v1.0'
     hooks:
       - id: clippy
-      - id: rust-fmt
+      - id: fmt
