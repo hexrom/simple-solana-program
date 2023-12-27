@@ -24,10 +24,12 @@ jobs:
     - name: Install cargo-audit
       run: cargo install cargo-audit
 
+    - name: Create audit-results directory
+      run: mkdir -p audit-results
+
     - name: Search and Audit Cargo Projects
       run: |
         audit_failures=0
-        mkdir -p audit-results
         for cargo_toml in $(find . -name 'Cargo.toml'); do
           dir=$(dirname $cargo_toml)
           project_name=$(basename "$dir")
@@ -41,7 +43,6 @@ jobs:
         echo "Cargo audit completed with $audit_failures project(s) having vulnerabilities."
         if [ $audit_failures -ne 0 ]; then
           echo "Please review the vulnerabilities reported above."
-          # Optional: exit with success to not fail the pipeline
           exit 0
         fi
 
