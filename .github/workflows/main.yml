@@ -13,7 +13,10 @@ jobs:
     steps:
     - name: Checkout code
       uses: actions/checkout@v2
-
+      
+    - name: Install system dependencies
+      run: sudo apt-get update && sudo apt-get install -y libudev-dev
+      
     - name: Install Rust toolchain
       uses: actions-rs/toolchain@v1
       with:
@@ -22,10 +25,14 @@ jobs:
         override: true
         
     - name: Install cargo-audit
-      run: cargo install cargo-audit
+      run: |
+        cargo install cargo-audit
+        sleep 5
 
     - name: Create audit-results directory
-      run: mkdir -p audit-results
+      run: |
+        mkdir -p audit-results
+        sleep 5
 
     - name: Run Clippy on all Rust projects
       run: |
