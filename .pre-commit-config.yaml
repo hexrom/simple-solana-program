@@ -1,0 +1,17 @@
+repos:
+  - repo: local
+    hooks:
+      - id: clippy
+        name: Clippy
+        entry: bash -c 'find . -name "Cargo.toml" -execdir cargo clippy \;'
+        language: system
+        pass_filenames: false
+        types: [rust]
+
+      - id: rust-fmt
+        name: rust-fmt
+        entry: bash -c 'find . -name "Cargo.toml" -execdir cargo fmt -- --check \;'
+        language: system
+        pass_filenames: false
+        types: [rust]
+
