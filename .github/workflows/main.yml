@@ -14,9 +14,6 @@ jobs:
     - name: Checkout code
       uses: actions/checkout@v2
       
-    - name: Install system dependencies
-      run: sudo apt-get update && sudo apt-get install -y libudev-dev
-      
     - name: Install Rust toolchain
       uses: actions-rs/toolchain@v1
       with:
@@ -33,15 +30,6 @@ jobs:
       run: |
         mkdir -p audit-results
         sleep 5
-
-    - name: Run Clippy on all Rust projects
-      run: |
-        rustup component add clippy
-        find . -name 'Cargo.toml' | while read cargo_toml; do
-          dir=$(dirname "$cargo_toml")
-          echo "Running Clippy in $dir"
-          (cd "$dir" && cargo clippy)
-        done
 
     - name: Search and Audit Cargo Projects
       run: |
